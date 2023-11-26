@@ -15,6 +15,7 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Spinner
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
@@ -215,6 +216,13 @@ class PostWriting : AppCompatActivity() {
 
         val postID = intent.getStringExtra("edit")
 
+        val title = intent.getStringExtra("title")
+        val price = intent.getStringExtra("price")
+        val body = intent.getStringExtra("text")
+        val image = intent.getStringExtra("image").toString()
+        println(image)
+
+
         //수정 모드
 //        fun loadPostData(postID: String) {
 //            itemsCollectionRef.document(postID)
@@ -325,6 +333,29 @@ class PostWriting : AppCompatActivity() {
                 imagewriting = "unwrapped"
                 imagespinner = "새 상품"
             }
+        }
+
+
+        edittitle.setText(title)
+        editprice.setText(price)
+        edittext.setText(body)
+
+        if (image == "unwrapped") {
+            imageView.setImageResource(R.drawable.unwrapped)
+            spinner.setSelection(0)
+        }
+        else if (image == "good") {
+            imageView.setImageResource(R.drawable.good)
+            spinner.setSelection(1)
+        }
+        else if (image.equals("normal")) {
+            println("done")
+            imageView.setImageResource(R.drawable.normal)
+            spinner.setSelection(2)
+        }
+        else if (image == "bad") {
+            imageView.setImageResource(R.drawable.bad)
+            spinner.setSelection(3)
         }
     }
 

@@ -74,9 +74,11 @@ class PostView : AppCompatActivity() {
         val sellerName = findViewById<TextView>(R.id.sellerName)
         val currentUser = FirebaseAuth.getInstance().currentUser?.displayName.toString()
 
+        val priceReal = intent.getStringExtra("price")
+
         val intent = intent
         title.text = intent.getStringExtra("title")
-        price.text = intent.getStringExtra("price")
+        price.text = priceReal + "원"
         text.text = intent.getStringExtra("text")
         sellerName.text = intent.getStringExtra("Author")
 
@@ -99,10 +101,13 @@ class PostView : AppCompatActivity() {
 
             when (item.itemId) {
                 R.id.menu_edit -> {
-
                     val intent = Intent(this, PostWriting::class.java)
-                    intent.putExtra("edit", "post1")
-                    intent.putExtra("editMode", true)
+//제목, 가격, 내용, 물건상태, 사진정보
+                    intent.putExtra("title", title.text)
+                    intent.putExtra("price", priceReal)
+                    intent.putExtra("text", text.text)
+                    intent.putExtra("condition", "")
+                    intent.putExtra("image", image)
 
                     startActivity(intent)
                     true

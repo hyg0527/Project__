@@ -28,6 +28,7 @@ class MainAdapter(private val items: ArrayList<Items>) : RecyclerView.Adapter<Ma
         val soldout = v.findViewById<TextView>(R.id.SoldoutTextView)
         val date = v.findViewById<TextView>(R.id.DateTextView)
         val image = v.findViewById<ImageView>(R.id.GoodsImageView)
+        val condition = v.findViewById<TextView>(R.id.textCondition)
         init {
             v.setOnClickListener {
                 val position = adapterPosition
@@ -35,7 +36,7 @@ class MainAdapter(private val items: ArrayList<Items>) : RecyclerView.Adapter<Ma
 
                 val author = items[position].author
                 val body = items[position].body
-                val price = items[position].price
+                val price = items[position].price.toString()
                 val title = items[position].title
                 val condition = items[position].condition
                 var image = ""
@@ -69,8 +70,9 @@ class MainAdapter(private val items: ArrayList<Items>) : RecyclerView.Adapter<Ma
 
     override fun onBindViewHolder(holder: ViewHolderItems, position: Int) {
         holder.title.text = items[position].title
-        holder.price.text = items[position].price.toString()
+        holder.price.text = items[position].price.toString() + "원"
         holder.date.text = items[position].date
+        holder.condition.text = items[position].condition
 
         holder.soldout.text = items[position].soldout.toString()
         if(items[position].soldout == true) holder.soldout.text = "판매완료"
