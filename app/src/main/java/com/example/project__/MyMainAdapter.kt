@@ -86,46 +86,6 @@ class MainAdapter(private val items: ArrayList<Items>) : RecyclerView.Adapter<Ma
     }
 }
 
-data class ItemsList(var author: String? = null)
-
-class MyMainAdapter(private val items: ArrayList<ItemsList>) : RecyclerView.Adapter<MyMainAdapter.MyViewHolder>() {
-    inner class MyViewHolder(v: View) : RecyclerView.ViewHolder(v) {
-        val author = v.findViewById<TextView>(R.id.textView3)
-        val enterChat = v.findViewById<Button>(R.id.enterChatReal)
-        init {
-            val currentUser = FirebaseAuth.getInstance().currentUser?.displayName.toString()
-            enterChat.setOnClickListener {
-                val position = adapterPosition
-                val context = itemView.context
-                if (position != RecyclerView.NO_POSITION) {
-                    // 클릭한 아이템의 위치(position)에 대한 작업 수행
-                    val author = items[position].author.toString() // 클릭 이벤트 처리
-                    if (author == currentUser) {
-                        Toast.makeText(context, "자신의 글에 채팅할 수 없습니다.", Toast.LENGTH_SHORT).show()
-                    }
-                    else {
-                        val intent = Intent(context, ChatActivity::class.java)
-                        intent.putExtra("author", author)
-                        context.startActivity(intent)
-                    }
-                }
-            }
-        }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val view = layoutInflater.inflate(R.layout.ltems_list, parent, false)
-        return MyViewHolder(view)
-    }
-    override fun getItemCount(): Int {
-        return items.count()
-    }
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        holder.author.text = items[position].author
-    }
-}
-
 data class ChatView(var name: String? = null, var text: String? = null, var time: String? = null)
 
 class MyListViewAdapter(private val items: ArrayList<ChatView>) : RecyclerView.Adapter<MyListViewAdapter.ListChatViewHolder>() {
