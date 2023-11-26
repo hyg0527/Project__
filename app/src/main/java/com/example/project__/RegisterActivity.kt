@@ -2,18 +2,17 @@ package com.example.project__
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
-import android.widget.TextView
-import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 @Suppress("DEPRECATION")
@@ -25,6 +24,16 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
+        //뒤로가기
+        val toolbar:Toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener{
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+        }
+        auth = Firebase.auth
+
         // 연도, 월, 일 선택에 사용할 데이터 배열 생성
         val years = (1965 until 2010).map { it.toString() }.toTypedArray()
         val months = (1..12).map { it.toString().padStart(2, '0') }.toTypedArray()
@@ -35,99 +44,112 @@ class RegisterActivity : AppCompatActivity() {
         val spinnerMonth = findViewById<Spinner>(R.id.spinnerMonth)
         val spinnerDay = findViewById<Spinner>(R.id.spinnerDay)
 
-        val selectedYear = spinnerYear?.selectedItem.toString()
-        val selectedMonth = spinnerMonth?.selectedItem.toString()
-        val selectedDay = spinnerDay?.selectedItem.toString()
-
-        // Ensure that month and day are represented as two digits
-        val formattedMonth = selectedMonth.padStart(2, '0')
-        val formattedDay = selectedDay.padStart(2, '0')
-
-        val birthdate = "$selectedYear$formattedMonth$formattedDay"
-
-        // 연도 스피너의 초기 선택 항목을 2000년으로 설정
-        val defaultYearPosition = years.indexOf("2000")
-        spinnerYear.setSelection(defaultYearPosition)
-
-
-        spinnerYear.adapter =
-            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, years)
-        spinnerMonth.adapter =
-            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, months)
+        spinnerYear.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, years)
+        spinnerMonth.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, months)
         spinnerDay.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, days)
 
-        findViewById<Button>(R.id.join).setOnClickListener {
-            val newID = findViewById<EditText>(R.id.join_email)
-            val newPW = findViewById<EditText>(R.id.join_password)
-            val confirmPW = findViewById<EditText>(R.id.editPWConfirm)
+        spinnerYear.setSelection(years.indexOf("2000"))
 
-            val idString = newID.text.toString()
-            val pwString = newPW.text.toString()
-            val cpwString = confirmPW.text.toString()
-            if (pwString == cpwString) {
-                signUp(idString, pwString, selectedYear, selectedMonth, selectedDay)
+        findViewById<Button>(R.id.join).setOnClickListener {
+            val email = findViewById<EditText>(R.id.join_email).text.toString()
+            val password = findViewById<EditText>(R.id.join_password).text.toString()
+            val passwordconfirm = findViewById<EditText>(R.id.editPWConfirm).text.toString()
+            val nickname = findViewById<EditText>(R.id.join_nickname).text.toString()
+            val name = findViewById<EditText>(R.id.join_name).text.toString()
+
+            val selectedYear = spinnerYear.selectedItem.toString()
+            val selectedMonth = spinnerMonth.selectedItem.toString()
+            val selectedDay = spinnerDay.selectedItem.toString()
+
+// Ensure that month and day are represented as two digits
+            val formattedMonth = selectedMonth.padStart(2, '0')
+            val formattedDay = selectedDay.padStart(2, '0')
+
+            if(email.isBlank() || password.isBlank() || nickname.isBlank() || name.isBlank() || selectedYear.isBlank() || selectedMonth.isBlank() || selectedDay.isBlank()){
+                showErrorDialog("모든 항목을 입력하세요.")
+                return@setOnClickListener
             }
-            else {
-                Toast.makeText(this, "비밀 번호가 일치 하지 않습 니다.", Toast.LENGTH_LONG).show()
-                newPW.setText("")
-                confirmPW.setText("")
+            if(password != passwordconfirm) {
+                showErrorDialog("비밀번호가 일치하지 않습니다.")
+                return@setOnClickListener
             }
+            val displayNameCollection = Firebase.firestore.collection("Users")
+            displayNameCollection
+                .whereEqualTo("nickname", nickname)
+                .get()
+                .addOnFailureListener{e ->
+                    showErrorDialog("닉네임 관련 에려 발생: ${e.message}")
+                    return@addOnFailureListener
+                }
+                .addOnSuccessListener { querySnapshot ->
+                    if(!querySnapshot.isEmpty){
+                        showErrorDialog("이미 사용 중인 닉네임입니다.")
+                        return@addOnSuccessListener
+                    }else{
+                        // Firebase Authentication을 사용하여 계정 생성
+                        auth.createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(this) { task ->
+                                if (task.isSuccessful) {
+                                    // 계정 생성 성공 시 사용자 정보 업데이트
+                                    val user = auth.currentUser
+                                    val profileUpdates = com.google.firebase.auth.userProfileChangeRequest {
+                                        displayName = nickname
+                                    }
+                                    //사용자 정보 users에 저장
+                                    val newUser = hashMapOf(
+                                        "nickname" to nickname,
+                                        "name" to name,
+                                        "email" to email,
+                                        "birthdate" to "$selectedYear 년 $formattedMonth 월 $formattedDay 일"
+                                    )
+                                    val newUserDocRef = Firebase.firestore.collection("Users").document()
+                                    newUserDocRef
+                                        .set(newUser)
+                                        .addOnSuccessListener {
+                                            user?.updateProfile(profileUpdates)
+                                                ?.addOnCompleteListener { profileTask ->
+                                                    if (profileTask.isSuccessful) {
+                                                        message = "닉네임: $nickname \n 이름: $name, 이메일: $email, 생년월일: $selectedYear 년 $formattedMonth 월 $formattedDay 일"
+                                                        showSuccessDialog()
+                                                    } else {
+                                                        // 사용자 정보 업데이트 실패 시 에러 다이얼로그 표시
+                                                        showErrorDialog("닉네임 관련 에러 발생!")
+                                                        return@addOnCompleteListener
+
+                                                    }
+                                                }
+                                                ?.addOnFailureListener {
+                                                    showErrorDialog("닉네임 관련 에러 발생: ${it.message}")
+                                                    return@addOnFailureListener
+                                                }
+                                        }
+
+
+                                }
+                                else{
+                                    if (task.exception is FirebaseAuthUserCollisionException) {
+                                        showErrorDialog("이미 가입된 이메일 주소입니다.")
+                                    }
+                                    else{
+                                        showErrorDialog("회원 가입 에러 발생: ${task.exception}")
+                                    }
+                                    return@addOnCompleteListener
+                                }
+                            }
+                    }
+
+                }
         }
     }
-    //회원 가입 함수
-    private fun signUp(email: String, password: String, year: String, month: String, day: String) {
-        val name = findViewById<EditText>(R.id.join_name).text.toString()
-        val nickname = findViewById<TextView>(R.id.join_nickname).text.toString()
 
-        // Firebase Authentication을 사용하여 계정 생성
-        val auth = Firebase.auth
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    // 계정 생성 성공 시 사용자 정보 업데이트
-                    val user = auth.currentUser
-                    val profileUpdates = com.google.firebase.auth.userProfileChangeRequest {
-                        displayName = nickname
-                    }
-
-                    user?.updateProfile(profileUpdates)
-                        ?.addOnCompleteListener { profileTask ->
-                            if (profileTask.isSuccessful) {
-                                // 추가 정보를 받아와서 MainActivity로 전달
-                                val intent = Intent(this, MainActivity::class.java)
-                                intent.putExtra("USER_NAME", name)
-                                intent.putExtra(
-                                    "USER_BIRTH",
-                                    "$year$month$day"
-                                )
-                                showSuccessDialog()
-
-                                Handler().postDelayed({
-                                    startActivity(intent)
-                                    finish()
-                                }, 1000)
-                            } else {
-                                // 사용자 정보 업데이트 실패 시 에러 다이얼로그 표시
-                                showErrorDialog("다른 닉네임을 선택하세요!")
-                            }
-                        }
-                } else {
-                    // FirebaseAuthUserCollisionException은 이미 가입된 이메일 주소인 경우 발생
-                    if (task.exception is FirebaseAuthUserCollisionException) {
-                        showErrorDialog("이미 가입된 이메일 주소입니다.")
-                    } else {
-                        // 그 외의 경우에는 일반적인 회원 가입 실패 에러 표시
-                        showErrorDialog("회원 가입 실패")
-                    }
-                }
-            }
-    }
     private fun showSuccessDialog() {
         val alertDialog = AlertDialog.Builder(this)
         alertDialog.setTitle("회원 가입 성공")
+        alertDialog.setMessage(message)
         alertDialog.setPositiveButton("확인") { _, _ ->
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, LoginActivity::class.java)
             startActivity(intent)
+            finish()
         }
         alertDialog.show()
     }
@@ -137,8 +159,6 @@ class RegisterActivity : AppCompatActivity() {
         alertDialog.setTitle("회원 가입 실패")
         alertDialog.setMessage(errorMessage)
         alertDialog.setPositiveButton("확인") { _, _ ->
-            findViewById<EditText>(R.id.join_email).text.clear()
-            findViewById<EditText>(R.id.join_password).text.clear()
         }
         alertDialog.show()
     }

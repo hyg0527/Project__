@@ -74,16 +74,15 @@ class PostView : AppCompatActivity() {
         val sellerName = findViewById<TextView>(R.id.sellerName)
         val currentUser = FirebaseAuth.getInstance().currentUser?.displayName.toString()
 
-        val priceReal = intent.getStringExtra("price")
-
         val intent = intent
         title.text = intent.getStringExtra("title")
-        price.text = priceReal + "원"
+        price.text = intent.getLongExtra("price", 10000).toString() + " 원"
+        print(price)
         text.text = intent.getStringExtra("text")
         sellerName.text = intent.getStringExtra("Author")
 
         val image = intent.getStringExtra("image")
-
+        val id = intent.getStringExtra("id")
         val resourceName = image // 동적으로 변경되는 리소스 이름
         val resourceId = resources.getIdentifier(resourceName, "drawable", packageName)
         imageView.setImageResource(resourceId)
@@ -94,21 +93,15 @@ class PostView : AppCompatActivity() {
             bottomNavigationView.visibility = View.VISIBLE
         else
             bottomNavigationView.visibility = View.GONE
-
-        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+        bottomNavigationView.setOnItemSelectedListener{ item ->
             val db = Firebase.firestore
-            val itemsCollectionRef = db.collection("your_collection")
+            val itemsCollectionRef = db.collection("post_post")
 
-            when (item.itemId) {
+            when (item.itemId){
                 R.id.menu_edit -> {
                     val intent = Intent(this, PostWriting::class.java)
-//제목, 가격, 내용, 물건상태, 사진정보
-                    intent.putExtra("title", title.text)
-                    intent.putExtra("price", priceReal)
-                    intent.putExtra("text", text.text)
-                    intent.putExtra("condition", "")
-                    intent.putExtra("image", image)
-
+                    intent.putExtra("edit", id)
+                    intent.putExtra("editMode", true)
                     startActivity(intent)
                     true
                 }
@@ -127,11 +120,12 @@ class PostView : AppCompatActivity() {
                     cancelDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                     cancelDialog.setContentView(R.layout.dialog)
 
-                        CancelDialog()
+                    CancelDialog()
                     true
                 }
                 else -> false
             }
+            return@setOnItemSelectedListener true
         }
 
         val sendButton = findViewById<Button>(R.id.chatButton)

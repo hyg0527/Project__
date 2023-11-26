@@ -9,10 +9,5 @@
         android:icon="@drawable/filter"
         android:title="필터"
         app:showAsAction="always" />
-    <item
-        android:id="@+id/top_logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:title="로그아웃"/>
 
 </menu>

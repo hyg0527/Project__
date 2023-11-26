@@ -10,8 +10,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
+import org.w3c.dom.Text
 
 data class Items(
+    var id: String? = null,
     var author:String? = null,//판매자
     var body: String? = null,//내용
     var condition:String? = null,//제품 상태
@@ -28,15 +30,15 @@ class MainAdapter(private val items: ArrayList<Items>) : RecyclerView.Adapter<Ma
         val soldout = v.findViewById<TextView>(R.id.SoldoutTextView)
         val date = v.findViewById<TextView>(R.id.DateTextView)
         val image = v.findViewById<ImageView>(R.id.GoodsImageView)
-        val condition = v.findViewById<TextView>(R.id.textCondition)
+        val id = v.findViewById<TextView>(R.id.documentId)
         init {
             v.setOnClickListener {
                 val position = adapterPosition
                 val context = itemView.context
-
+                val id = items[position].id
                 val author = items[position].author
                 val body = items[position].body
-                val price = items[position].price.toString()
+                val price = items[position].price
                 val title = items[position].title
                 val condition = items[position].condition
                 var image = ""
@@ -47,6 +49,7 @@ class MainAdapter(private val items: ArrayList<Items>) : RecyclerView.Adapter<Ma
                 else if (condition == "상태 안 좋음") image = "bad"
 
                 val intent = Intent(context, PostView::class.java)
+                intent.putExtra("id", id)
                 intent.putExtra("Author", author)
                 intent.putExtra("text", body)
                 intent.putExtra("price", price)
@@ -72,7 +75,7 @@ class MainAdapter(private val items: ArrayList<Items>) : RecyclerView.Adapter<Ma
         holder.title.text = items[position].title
         holder.price.text = items[position].price.toString() + "원"
         holder.date.text = items[position].date
-        holder.condition.text = items[position].condition
+        holder.id.text = items[position].id
 
         holder.soldout.text = items[position].soldout.toString()
         if(items[position].soldout == true) holder.soldout.text = "판매완료"
@@ -85,6 +88,46 @@ class MainAdapter(private val items: ArrayList<Items>) : RecyclerView.Adapter<Ma
             "상태 보통" -> holder.image.setImageResource(R.drawable.normal)
             "상태 안 좋음" -> holder.image.setImageResource(R.drawable.bad)
         }
+    }
+}
+
+data class ItemsList(var author: String? = null)
+
+class MyMainAdapter(private val items: ArrayList<ItemsList>) : RecyclerView.Adapter<MyMainAdapter.MyViewHolder>() {
+    inner class MyViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        val author = v.findViewById<TextView>(R.id.textView3)
+        val enterChat = v.findViewById<Button>(R.id.enterChatReal)
+        init {
+            val currentUser = FirebaseAuth.getInstance().currentUser?.displayName.toString()
+            enterChat.setOnClickListener {
+                val position = adapterPosition
+                val context = itemView.context
+                if (position != RecyclerView.NO_POSITION) {
+                    // 클릭한 아이템의 위치(position)에 대한 작업 수행
+                    val author = items[position].author.toString() // 클릭 이벤트 처리
+                    if (author == currentUser) {
+                        Toast.makeText(context, "자신의 글에 채팅할 수 없습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                    else {
+                        val intent = Intent(context, ChatActivity::class.java)
+                        intent.putExtra("author", author)
+                        context.startActivity(intent)
+                    }
+                }
+            }
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val view = layoutInflater.inflate(R.layout.ltems_list, parent, false)
+        return MyViewHolder(view)
+    }
+    override fun getItemCount(): Int {
+        return items.count()
+    }
+    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+        holder.author.text = items[position].author
     }
 }
 

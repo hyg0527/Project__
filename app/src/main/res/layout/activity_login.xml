@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@color/design_default_color_background">
 
     <ImageView
         android:id="@+id/imageView"
@@ -17,16 +18,15 @@
         app:srcCompat="@drawable/logo" />
 
     <EditText
-        android:id="@+id/email"
+        android:id="@+id/text_email"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         android:layout_marginTop="80dp"
         android:ems="15"
+        android:fontFamily="@font/gmarketmedium"
         android:hint="이메일"
         android:inputType="textEmailAddress"
-        android:text="test1@test.com"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.505"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
@@ -35,30 +35,30 @@
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginEnd="48dp"
-        android:layout_marginBottom="84dp"
+        android:layout_marginTop="30dp"
+        android:layout_marginEnd="51dp"
         android:backgroundTint="@color/darkblue"
+        android:fontFamily="@font/gmarketbold"
         android:text="회원가입"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:cornerRadius="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/login"
-        app:layout_constraintTop_toBottomOf="@+id/password"
-        app:layout_constraintVertical_bias="0.758" />
+        app:layout_constraintTop_toBottomOf="@+id/password" />
 
     <Button
         android:id="@+id/login"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginBottom="84dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="30dp"
         android:backgroundTint="@color/darkblue"
+        android:fontFamily="@font/gmarketbold"
         android:text="로그인"
         android:textColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:cornerRadius="5dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/password"
-        app:layout_constraintVertical_bias="0.758" />
+        app:layout_constraintTop_toBottomOf="@+id/password" />
 
     <EditText
         android:id="@+id/password"
@@ -66,13 +66,12 @@
         android:layout_height="50dp"
         android:layout_marginTop="8dp"
         android:ems="15"
+        android:fontFamily="@font/gmarketmedium"
         android:hint="비밀번호"
         android:inputType="textPassword"
-        android:text="logintest"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/email" />
+        app:layout_constraintTop_toBottomOf="@+id/text_email" />
 
     <TextView
         android:id="@+id/textView2"
@@ -81,10 +80,11 @@
         android:layout_marginStart="49dp"
         android:layout_marginEnd="49dp"
 
+        android:fontFamily="@font/gmarketmedium"
         android:text="당신의 포켓 속 가장 작은 시장"
         android:textColor="#172A6E"
         android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/email"
+        app:layout_constraintBottom_toTopOf="@+id/text_email"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView" />

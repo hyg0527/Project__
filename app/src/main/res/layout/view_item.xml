@@ -73,14 +73,14 @@
             tools:ignore="TouchTargetSizeCheck,SpeakableTextPresentCheck" />
 
         <TextView
-            android:id="@+id/textCondition"
+            android:id="@+id/documentId"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="79dp"
             android:layout_marginBottom="44dp"
             android:enabled="false"
             android:text="TextView"
-            android:visibility="invisible"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@+id/DateTextView"
             app:layout_constraintStart_toEndOf="@+id/titleTextView" />
 

@@ -36,9 +36,10 @@
                 android:id="@+id/TitleText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="15dp"
                 android:layout_marginBottom="8dp"
-                android:paddingStart="16dp"
+                android:fontFamily="@font/gmarketbold"
                 android:text="제목"
                 android:textSize="24dp"
                 android:textStyle="bold" />
@@ -60,6 +61,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:fontFamily="@font/gmarketbold"
                     android:paddingStart="16dp"
                     android:text="판매자 이름"
                     android:textSize="18dp" />
@@ -69,7 +71,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="0.1"
-                    android:background="@drawable/writingtext"
+                    android:backgroundTint="@color/darkblue"
+                    android:fontFamily="@font/gmarketbold"
                     android:text="채팅하기"
                     android:textSize="18dp"
                     android:textStyle="bold" />
@@ -98,7 +101,8 @@
                     android:id="@+id/PriceText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingStart="16dp"
+                    android:layout_marginLeft="10dp"
+                    android:fontFamily="@font/gmarketmedium"
                     android:paddingEnd="8dp"
                     android:text="8,000원"
                     android:textSize="20dp"
@@ -106,9 +110,11 @@
 
                 <TextView
                     android:id="@+id/NowOn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:background="@drawable/nowon"
+                    android:layout_width="70dp"
+                    android:layout_height="40dp"
+                    android:layout_marginLeft="20dp"
+                    android:background="@color/darkblue"
+                    android:fontFamily="@font/gmarketbold"
                     android:gravity="center"
                     android:includeFontPadding="false"
                     android:insetTop="0dp"
@@ -117,15 +123,17 @@
                     android:minHeight="48dp"
                     android:text="판매중"
                     android:textColor="#FFFFFFFF"
-                    android:textSize="12dp" />
+                    android:textSize="18sp" />
             </LinearLayout>
 
             <TextView
                 android:id="@+id/TextText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
                 android:layout_marginTop="24dp"
-                android:paddingStart="16dp"
+                android:layout_marginRight="10dp"
+                android:fontFamily="@font/gmarketmedium"
                 android:text="내용이 들어갑니다."
                 android:textSize="16dp" />
 
@@ -138,6 +146,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
+        app:itemIconTint="@color/black"
+        app:itemTextColor="@android:color/primary_text_light_nodisable"
         app:menu="@menu/bottom_nav_menu" />
 
 </LinearLayout>
