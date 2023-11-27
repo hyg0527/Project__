@@ -4,10 +4,7 @@
 
     <item
         android:id="@+id/action_register"
-        android:textColor="#FFFFFFFF"
         android:title="등록"
-        android:textSize="18dp"
-        android:textStyle="bold"
         app:showAsAction="always" />
 
 

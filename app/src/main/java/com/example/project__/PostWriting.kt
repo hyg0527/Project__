@@ -20,10 +20,12 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.drawable.toDrawable
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlin.properties.Delegates
 
 class PostWriting : AppCompatActivity() {
     private lateinit var edittitle: EditText
@@ -31,7 +33,8 @@ class PostWriting : AppCompatActivity() {
     private lateinit var edittext: EditText
     private lateinit var imagespinner: String
     private lateinit var imagewriting: String
-    private var isEditMode = false
+    private var isEditMode by Delegates.notNull<Boolean>()
+
     var price = 0
     var postcount = 2
     //private lateinit var sellername: EditText
@@ -43,16 +46,18 @@ class PostWriting : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val postID = intent.getStringExtra("edit").toString()
         edittitle = findViewById(R.id.EditTitle)
         editprice = findViewById(R.id.EditPrice)
         edittext = findViewById(R.id.EditText)
-
+        val imageView = findViewById<ImageView>(R.id.imageView)
+        imageView.visibility = View.VISIBLE
+        isEditMode = intent.getBooleanExtra("editMode", false)
         val checktitle_empty = edittitle.text.toString().trim()
         val checkprice_empty = editprice.text.toString().trim()
         val checktext_empty = edittext.text.toString().trim()
-
+        val intent = Intent(this, PostView::class.java)
         val db: FirebaseFirestore = Firebase.firestore
-        val itemsCollectionRef = db.collection("pocket_post")
 
         fun getCurrentDateTime(): String {
             val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", java.util.Locale.getDefault())
@@ -90,15 +95,18 @@ class PostWriting : AppCompatActivity() {
 
             // Firestore에 데이터 추가
             itemsCollectionRef.document(documentName).set(listInfo)
+                .addOnSuccessListener {
+                    Toast.makeText(this, "글 등록 성공!", Toast.LENGTH_SHORT).show()
+                    startActivity(Intent(this,MainActivity::class.java))
+                }
         }
-        fun updatePost(postID: String) {
+        fun updatePost(postID : String) {
             // postId에 해당하는 문서 가져오기
             val itemsCollectionRef = db.collection("pocket_post")
             val postDocRef = itemsCollectionRef.document(postID)
-
             // 업데이트할 데이터
             val updateData = hashMapOf<String, Any>(
-                "price" to editprice.text.toString(),
+                "price" to editprice.text.toString().toLong(),
                 "body" to edittext.text.toString(),
                 "title" to edittitle.text.toString(),
                 "date" to getCurrentDateTime(),
@@ -107,18 +115,8 @@ class PostWriting : AppCompatActivity() {
             )
 
             postDocRef.update(updateData).addOnSuccessListener {
-                // 업데이트 성공 시 필요한 작업 수행
-                val postID = intent.getStringExtra("edit")
-                if (isEditMode && postID != null) {
-
-                    updatePost(postID)
-                    isEditMode = false
-                }
-                else {
-                    // 게시물 작성
-                    registerPost()
-                }
-
+                Toast.makeText(this, "글 수정 성공!", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this,MainActivity::class.java))
             }
                 .addOnFailureListener { e ->
                     // 업데이트 실패 시 에러 처리
@@ -128,21 +126,19 @@ class PostWriting : AppCompatActivity() {
 
         when (item.itemId) {
             R.id.action_register -> {
-                registerPost()
+
                 val myInstance2 = MyClass()
                 val propertyValue = myInstance2.getMyProperty()
 
                 val currentUser = FirebaseAuth.getInstance().currentUser?.displayName.toString()
-                val id = findViewById<TextView>(R.id.idText)
-                val intent = Intent(this, PostView::class.java)
                 intent.putExtra("title", edittitle.text.toString())
-                intent.putExtra("price", editprice.text.toString())
+                intent.putExtra("price", editprice.text.toString().toLong())
                 intent.putExtra("text", edittext.text.toString())
                 intent.putExtra("value", propertyValue)
                 intent.putExtra("condition", imagespinner)
                 intent.putExtra("image", imagewriting)
                 intent.putExtra("Author", currentUser)
-                intent.putExtra("id", id.text)
+                intent.putExtra("id", intent.getStringExtra("edit"))
 
                 fun isInteger(value: String): Boolean {
                     return try {
@@ -152,7 +148,6 @@ class PostWriting : AppCompatActivity() {
                         false
                     }
                 }
-
                 if(!isInteger(checkprice_empty)) {
                     Toast.makeText(applicationContext, "가격란에는 정수를 입력해주세요.", Toast.LENGTH_SHORT).show()
                     return true
@@ -168,8 +163,12 @@ class PostWriting : AppCompatActivity() {
                     Toast.makeText(applicationContext, "내용란이 비어있습니다.", Toast.LENGTH_SHORT).show()
                     return true
                 }
-
-                startActivity(intent)
+                if (isEditMode) {
+                    updatePost(postID)
+                }
+                else{
+                    registerPost()
+                }
                 return true
             }
             else -> return super.onOptionsItemSelected(item)
@@ -190,10 +189,8 @@ class PostWriting : AppCompatActivity() {
 
         val spinner = findViewById<Spinner>(R.id.categorySpinner)
         val imageView = findViewById<ImageView>(R.id.imageView)
-
         val postID = intent.getStringExtra("edit")
-        isEditMode = intent.getBooleanExtra("editMode", false)
-
+        isEditMode = intent.getBooleanExtra("editMode", true)
         @SuppressLint("DiscouragedApi")
         fun loadPostData(postID: String) {
             itemsCollectionRef.document(postID)
@@ -203,31 +200,40 @@ class PostWriting : AppCompatActivity() {
                         val title = documentSnapshot.getString("title")
                         val price = documentSnapshot.getLong("price").toString()
                         val text = documentSnapshot.getString("body")
-                        val resourceName = documentSnapshot.getString("condition")
+                        imageView.setImageDrawable(R.drawable.normal.toDrawable())
+                        when (documentSnapshot.getString("condition")) {
+                            "새 상품" -> {
+                                imagewriting = "unwrapped"
+                                val resourceId = resources.getIdentifier(imagewriting, "drawable", packageName)
+                                imageView.visibility = View.VISIBLE
+                                imageView.setImageResource(resourceId)
 
-                        if(resourceName == "새 상품") {
-                            imagewriting = "unwrapped"
-                            val resourceId = resources.getIdentifier("imagewriting", "drawable", packageName)
-                            imageView.setImageResource(resourceId)
-                            spinner.setSelection(0)
-                        }
-                        else if(resourceName == "상태 좋음") {
-                            imagewriting = "good"
-                            val resourceId = resources.getIdentifier("imagewriting", "drawable", packageName)
-                            imageView.setImageResource(resourceId)
-                            spinner.setSelection(1)
-                        }
-                        else if(resourceName == "상태 보통") {
-                            imagewriting = "normal"
-                            val resourceId = resources.getIdentifier("imagewriting", "drawable", packageName)
-                            imageView.setImageResource(resourceId)
-                            spinner.setSelection(2)
-                        }
-                        else {
-                            imagewriting = "bad"
-                            val resourceId = resources.getIdentifier("imagewriting", "drawable", packageName)
-                            imageView.setImageResource(resourceId)
-                            spinner.setSelection(3)
+                                spinner.setSelection(0)
+                            }
+                            "상태 좋음" -> {
+                                imagewriting = "good"
+                                val resourceId = resources.getIdentifier(imagewriting, "drawable", packageName)
+                                imageView.visibility = View.VISIBLE
+                                imageView.setImageResource(resourceId)
+
+                                spinner.setSelection(1)
+                            }
+                            "상태 보통" -> {
+                                imagewriting = "normal"
+                                val resourceId = resources.getIdentifier(imagewriting, "drawable", packageName)
+                                spinner.setSelection(2)
+                                imageView.visibility = View.VISIBLE
+                                imageView.setImageResource(resourceId)
+
+
+                            }
+                            else -> {
+                                imagewriting = "bad"
+                                val resourceId = resources.getIdentifier(imagewriting, "drawable", packageName)
+                                imageView.visibility = View.VISIBLE
+                                imageView.setImageResource(resourceId)
+                                spinner.setSelection(3)
+                            }
                         }
 
                         edittitle.setText(title)
@@ -255,6 +261,7 @@ class PostWriting : AppCompatActivity() {
         // 뒤로가기 버튼
         toolbar.setNavigationOnClickListener {
             val intent = Intent(this, PostView::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
             startActivity(intent)
         }
 
@@ -274,17 +281,17 @@ class PostWriting : AppCompatActivity() {
                 val selectedItem = spinnerItems[position]
 
                 when (selectedItem) {
-                    spinnerItems[0] -> {
+                    spinnerItems[2] -> {
                         imageView.setImageResource(R.drawable.unwrapped)
                         imagewriting = "unwrapped"
                         imagespinner = "새 상품"
                     }
-                    spinnerItems[1] -> {
+                    spinnerItems[0] -> {
                         imageView.setImageResource(R.drawable.good)
                         imagewriting = "good"
                         imagespinner = "상태 좋음"
                     }
-                    spinnerItems[2] -> {
+                    spinnerItems[1] -> {
                         imageView.setImageResource(R.drawable.normal)
                         imagewriting = "normal"
                         imagespinner = "상태 보통"
@@ -299,8 +306,8 @@ class PostWriting : AppCompatActivity() {
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 imageView.setImageResource(R.drawable.unwrapped)
-                imagewriting = "unwrapped"
-                imagespinner = "새 상품"
+                imagewriting = "normal"
+                imagespinner = "상태 보통"
             }
         }
     }

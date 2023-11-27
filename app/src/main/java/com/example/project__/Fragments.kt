@@ -1,28 +1,22 @@
 package com.example.project__
 
 import android.content.ContentValues
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
-import android.view.ContextMenu
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -32,55 +26,47 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
-//    override fun onContextItemSelected(item: MenuItem): Boolean {
-//        when(item.itemId){
-//            R.id.top_filter ->
-//        }
-//        return super.onContextItemSelected(item)
-//    }
+    private val itemList = ArrayList<Items>()
+    private val boardAdapter = MainAdapter(itemList)
+    private var shouldExcludeSoldOut = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         // RecyclerView 초기화
+        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipe)
         val recyclerView = view.findViewById<RecyclerView>(R.id.showItemrecyclerView)
-        val itemList = ArrayList<Items>()
-        val boardAdapter = MainAdapter(itemList)
         // LinearLayoutManager 설정
         val layoutManager = LinearLayoutManager(requireActivity())
         recyclerView.layoutManager = layoutManager
         val dividerItemDecoration = DividerItemDecoration(requireActivity(), layoutManager.orientation)
         recyclerView.addItemDecoration(dividerItemDecoration)
 
-        val documentRef = Firebase.firestore.collection("pocket_post").orderBy("date", Query.Direction.DESCENDING)
-        documentRef.addSnapshotListener { snapshot, e ->
-            if (e != null) { // 오류 처리
-                Log.w(ContentValues.TAG, "Listen failed.", e)
-            }
-            snapshot?.documentChanges?.forEach { change ->
-                when (change.type) {
-                    DocumentChange.Type.ADDED -> { // document 추가될 때
-                        itemList.clear()
-                        for (document in snapshot) {
-                            val item = Items(
-                                        document["id"] as String?,
-                                        document["author"] as String?,
-                                        document["body"] as String?,
-                                        document["condition"] as String?,
-                                        document["date"] as String?,
-                                        document["price"] as Long?,
-                                        document["soldout"] as Boolean?,
-                                        document["title"] as String?,)
-                            itemList.add(item)
-                            boardAdapter.notifyDataSetChanged()
-                        }
-                    }
-                    else -> {}
+        val textView = view.findViewById<TextView>(R.id.textViewUserName)
+        val text = "${Firebase.auth.currentUser?.displayName}"
+        textView.text = text
+
+        loadData()
+        recyclerView.adapter = boardAdapter
+        recyclerView.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
+
+        swipeRefreshLayout.setOnRefreshListener {
+            loadData()
+            swipeRefreshLayout.isRefreshing = false
+        }
+        val toolbar: Toolbar = view.findViewById(R.id.toolbar2)
+        toolbar.inflateMenu(R.menu.filter)
+        toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.menu_exclude_sold_out -> {
+                    shouldExcludeSoldOut = !shouldExcludeSoldOut
+                    loadData()
+                    item.isChecked = shouldExcludeSoldOut // Update the check state
+                    true
                 }
+                else -> false
             }
         }
 
-        recyclerView.adapter = boardAdapter
-        recyclerView.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
 
         // author, body, condition, date, price, soldout, title
         view.findViewById<FloatingActionButton>(R.id.enrollList).setOnClickListener {
@@ -88,7 +74,40 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             startActivity(intent)
 //            requireActivity().finish() // 현재 activity 종료
         }
+
         return view
+    }
+  fun loadData() {
+        val collectionRef = Firebase.firestore.collection("pocket_post")
+
+        val query = when {
+            shouldExcludeSoldOut -> collectionRef.whereEqualTo("soldout", false)
+            else -> {
+                collectionRef
+            }
+        }
+
+        query.orderBy("date", Query.Direction.DESCENDING).get()
+            .addOnSuccessListener { documents ->
+                itemList.clear()
+                for (document in documents) {
+                    val item = Items(
+                        document["id"] as String?,
+                        document["author"] as String?,
+                        document["body"] as String?,
+                        document["condition"] as String?,
+                        document["date"] as String?,
+                        document["price"] as Long?,
+                        document["soldout"] as Boolean?,
+                        document["title"] as String?,
+                    )
+                    itemList.add(item)
+                }
+                boardAdapter.notifyDataSetChanged()
+            }
+            .addOnFailureListener { e ->
+                Log.w(ContentValues.TAG, "Error getting documents.", e)
+            }
     }
 }
 class ChatFragment : Fragment(R.layout.chat_fragment) {
@@ -97,7 +116,9 @@ class ChatFragment : Fragment(R.layout.chat_fragment) {
         val view = inflater.inflate(R.layout.chat_fragment, container, false)
         initRecyclerView(view)
         isViewCreated = false
-
+        val textView = view.findViewById<TextView>(R.id.textViewUserName)
+        val text = "${Firebase.auth.currentUser?.displayName}"
+        textView.text = text
         return view
     }
     // 뷰가 새로 갱신될 때마다 addactionListener가 적용 되도록 구현

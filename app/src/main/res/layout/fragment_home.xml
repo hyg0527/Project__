@@ -7,23 +7,12 @@
     android:background="@color/design_default_color_on_primary"
     tools:context=".HomeFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/showItemrecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:scrollbars="vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/view_item" />
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/enrollList"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="15dp"
         android:clickable="true"
         android:contentDescription="글쓰기"
         android:foregroundTint="@color/white"
@@ -32,5 +21,51 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:tint="@android:color/white" />
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/pocket"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+        <TextView
+            android:id="@+id/textViewUserName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/gmarketbold"
+            android:text="Hello"
+            android:textSize="20sp"
+            tools:layout_editor_absoluteX="186dp"
+            tools:layout_editor_absoluteY="18dp">
+
+        </TextView>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar2">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/showItemrecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scrollbars="vertical"
+            app:layout_constraintBottom_toBottomOf="@id/enrollList"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="parent"
+            tools:listitem="@layout/view_item" />
+
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

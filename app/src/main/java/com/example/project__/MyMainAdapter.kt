@@ -41,6 +41,7 @@ class MainAdapter(private val items: ArrayList<Items>) : RecyclerView.Adapter<Ma
                 val price = items[position].price
                 val title = items[position].title
                 val condition = items[position].condition
+                val soldout = items[position].soldout
                 var image = ""
 
                 if (condition == "새 상품") image = "unwrapped"
@@ -55,6 +56,8 @@ class MainAdapter(private val items: ArrayList<Items>) : RecyclerView.Adapter<Ma
                 intent.putExtra("price", price)
                 intent.putExtra("title", title)
                 intent.putExtra("image", image)
+                intent.putExtra("soldout", soldout)
+                intent.putExtra("condition", condition)
 
                 context.startActivity(intent)
             }
@@ -78,15 +81,19 @@ class MainAdapter(private val items: ArrayList<Items>) : RecyclerView.Adapter<Ma
         holder.id.text = items[position].id
 
         holder.soldout.text = items[position].soldout.toString()
-        if(items[position].soldout == true) holder.soldout.text = "판매완료"
-        else holder.soldout.text = "판매중"
-
         holder.date.text = items[position].date
         when (items[position].condition) {
             "새 상품" -> holder.image.setImageResource(R.drawable.unwrapped)
             "상태 좋음" -> holder.image.setImageResource(R.drawable.good)
             "상태 보통" -> holder.image.setImageResource(R.drawable.normal)
             "상태 안 좋음" -> holder.image.setImageResource(R.drawable.bad)
+        }
+        if(items[position].soldout == true) {
+            holder.soldout.text = "판매완료"
+            holder.image.setImageResource(R.drawable.soldout)
+        }
+        else {
+            holder.soldout.text = "판매중"
         }
     }
 }

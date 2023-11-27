@@ -24,9 +24,5 @@ class MainActivity : AppCompatActivity() {
         val navController = navHostFragment.navController
         val bottomNavigationView = findViewById<BottomNavigationView>(R.id.bottomNavigationView)
         bottomNavigationView.setupWithNavController(navController)
-
-        val textView = findViewById<TextView>(R.id.textViewUserName)
-        val text = "안녕하세요, ${Firebase.auth.currentUser?.displayName}님!"
-        textView.text = text
     }
 }

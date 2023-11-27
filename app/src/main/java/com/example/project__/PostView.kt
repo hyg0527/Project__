@@ -1,5 +1,6 @@
 package com.example.project__
 
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.ContentValues.TAG
 import android.content.Intent
@@ -16,6 +17,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.drawable.toDrawable
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -31,9 +33,12 @@ class PostView : AppCompatActivity() {
     var nowon = false
 
     val db: FirebaseFirestore = Firebase.firestore
-    val documentRef = db.collection("pocket_post").document("post2")
 
     fun updateSoldOutFalse(documentId: String, newFieldValue: Boolean) {
+
+        val db: FirebaseFirestore = Firebase.firestore
+        val documentRef = db.collection("pocket_post").document(documentId)
+
         val updates = hashMapOf<String, Any>(
             "soldout" to true
         )
@@ -41,10 +46,11 @@ class PostView : AppCompatActivity() {
             "soldout" to false
         )
 
-        if (nowon == false)
+        if (!newFieldValue)
             documentRef.update(updatesFalse)
         else
             documentRef.update(updates)
+        Toast.makeText(applicationContext, "상태가 변경되었습니다.", Toast.LENGTH_SHORT).show()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -52,6 +58,7 @@ class PostView : AppCompatActivity() {
         return true
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_post_view)
@@ -61,8 +68,6 @@ class PostView : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // 뒤로가기 버튼 활성화
         toolbar.setNavigationOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
-
-            intent.putExtra("image", imageString)
             startActivity(intent)
         }
 
@@ -76,17 +81,29 @@ class PostView : AppCompatActivity() {
 
         val intent = intent
         title.text = intent.getStringExtra("title")
-        price.text = intent.getLongExtra("price", 10000).toString() + " 원"
-        print(price)
+        price.text = intent.getLongExtra("price", 1000).toString() + " 원"
         text.text = intent.getStringExtra("text")
         sellerName.text = intent.getStringExtra("Author")
-
-        val image = intent.getStringExtra("image")
+        val condition = intent.getStringExtra("condition")
         val id = intent.getStringExtra("id")
-        val resourceName = image // 동적으로 변경되는 리소스 이름
-        val resourceId = resources.getIdentifier(resourceName, "drawable", packageName)
-        imageView.setImageResource(resourceId)
-
+        when(condition){
+            "새 상품" -> {
+                imageView.setImageResource(R.drawable.unwrapped)
+            }
+            "상태 좋음" -> {
+                imageView.setImageResource(R.drawable.good)
+            }
+            "상태 보통" ->{
+                imageView.setImageResource(R.drawable.normal)
+            }
+            else->{
+                imageView.setImageResource(R.drawable.bad)
+            }
+        }
+        val soldout = intent.getBooleanExtra("soldout",false)
+        if(soldout){
+            imageView.setImageResource(R.drawable.soldout)
+        }
         bottomNavigationView = findViewById(R.id.navigationView)
 
         if (sellerName.text == currentUser)
@@ -94,9 +111,6 @@ class PostView : AppCompatActivity() {
         else
             bottomNavigationView.visibility = View.GONE
         bottomNavigationView.setOnItemSelectedListener{ item ->
-            val db = Firebase.firestore
-            val itemsCollectionRef = db.collection("post_post")
-
             when (item.itemId){
                 R.id.menu_edit -> {
                     val intent = Intent(this, PostWriting::class.java)
@@ -111,7 +125,9 @@ class PostView : AppCompatActivity() {
                     changeDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                     changeDialog.setContentView(R.layout.change_state)
 
-                    ChangeDialog()
+                    if (id != null) {
+                        ChangeDialog(id)
+                    }
                     true
                 }
                 R.id.menu_delete -> {
@@ -119,8 +135,9 @@ class PostView : AppCompatActivity() {
                     cancelDialog.requestWindowFeature(Window.FEATURE_NO_TITLE) // 타이틀 제거
                     cancelDialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
                     cancelDialog.setContentView(R.layout.dialog)
-
-                    CancelDialog()
+                    if (id != null) {
+                        CancelDialog(id)
+                    }
                     true
                 }
                 else -> false
@@ -140,7 +157,7 @@ class PostView : AppCompatActivity() {
         }
     }
 
-    private fun CancelDialog() {
+    private fun CancelDialog(id: String) {
         cancelDialog.show() // 다이얼로그 띄우기
 
         val NoButton = cancelDialog.findViewById<Button>(R.id.NoButton)
@@ -149,11 +166,17 @@ class PostView : AppCompatActivity() {
         }
 
         cancelDialog.findViewById<Button>(R.id.YesButton).setOnClickListener {
+            val itemsCollectionRef = db.collection("pocket_post")
+            val postDocRef = itemsCollectionRef.document(id)
+            postDocRef.delete()
             finish()
+            Toast.makeText(this, "글 삭제 성공!", Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
         }
     }
 
-    private fun ChangeDialog() {
+    private fun ChangeDialog(id: String) {
         changeDialog.show() // 다이얼로그 띄우기
 
         val SellButton = changeDialog.findViewById<Button>(R.id.NowSell)
@@ -171,13 +194,12 @@ class PostView : AppCompatActivity() {
             val NowOn = findViewById<TextView>(R.id.NowOn)
             if (NowOn.text != "판매중") {
                 NowOn.text = "판매중"
-                Toast.makeText(applicationContext, "상태가 변경되었습니다.", Toast.LENGTH_SHORT).show()
                 changeDialog.dismiss()
                 nowon = false
                 val resourceName = imageString // 동적으로 변경되는 리소스 이름
                 val resourceId = resources.getIdentifier(resourceName, "drawable", packageName)
                 imageView.setImageResource(resourceId)
-                updateSoldOutFalse("post2", false)
+                updateSoldOutFalse(id, false)
             }
             changeDialog.dismiss()
         }
@@ -186,12 +208,10 @@ class PostView : AppCompatActivity() {
             val NowOn = findViewById<TextView>(R.id.NowOn)
             if (NowOn.text != "판매완료") {
                 NowOn.text = "판매완료"
-                Toast.makeText(applicationContext, "상태가 변경되었습니다.", Toast.LENGTH_SHORT).show()
                 changeDialog.dismiss()
                 nowon = true
                 imageView.setImageResource(R.drawable.soldout)
-                updateSoldOutFalse("post2", true)
-
+                updateSoldOutFalse(id, true)
             }
             changeDialog.dismiss()
         }
