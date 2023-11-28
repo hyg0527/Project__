@@ -57,6 +57,7 @@ class LoginActivity : AppCompatActivity() {
                     saveLoginStatus(true, userEmail, password)
                     val welcomeMessage = "안녕하세요, ${Firebase.auth.currentUser?.displayName} 님!"
                     Toast.makeText(this, welcomeMessage, Toast.LENGTH_SHORT).show()
+                    finish()
                     startActivity(Intent(this, MainActivity::class.java))
                 } else {
                     val errorMessage = getErrorMessage(task.exception)

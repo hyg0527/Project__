@@ -200,15 +200,14 @@ class PostWriting : AppCompatActivity() {
                         val title = documentSnapshot.getString("title")
                         val price = documentSnapshot.getLong("price").toString()
                         val text = documentSnapshot.getString("body")
-                        imageView.setImageDrawable(R.drawable.normal.toDrawable())
-                        when (documentSnapshot.getString("condition")) {
+                        val condition= documentSnapshot.getString("condition")
+                        when (condition) {
                             "새 상품" -> {
                                 imagewriting = "unwrapped"
                                 val resourceId = resources.getIdentifier(imagewriting, "drawable", packageName)
                                 imageView.visibility = View.VISIBLE
                                 imageView.setImageResource(resourceId)
-
-                                spinner.setSelection(0)
+                                spinner.setSelection(2)
                             }
                             "상태 좋음" -> {
                                 imagewriting = "good"
@@ -216,12 +215,12 @@ class PostWriting : AppCompatActivity() {
                                 imageView.visibility = View.VISIBLE
                                 imageView.setImageResource(resourceId)
 
-                                spinner.setSelection(1)
+                                spinner.setSelection(0)
                             }
                             "상태 보통" -> {
                                 imagewriting = "normal"
                                 val resourceId = resources.getIdentifier(imagewriting, "drawable", packageName)
-                                spinner.setSelection(2)
+                                spinner.setSelection(1)
                                 imageView.visibility = View.VISIBLE
                                 imageView.setImageResource(resourceId)
 
@@ -260,9 +259,17 @@ class PostWriting : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         // 뒤로가기 버튼
         toolbar.setNavigationOnClickListener {
-            val intent = Intent(this, PostView::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
-            startActivity(intent)
+            val editMode = intent.getBooleanExtra("editMode", false)
+            if(editMode){
+                val intent = Intent(this, PostView::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP
+                startActivity(intent)
+            }
+            else{
+                val intent = Intent(this, MainActivity::class.java)
+                finish()
+                startActivity(intent)
+            }
         }
 
         val spinnerItems: Array<String> = resources.getStringArray(R.array.categories)
@@ -279,7 +286,6 @@ class PostWriting : AppCompatActivity() {
             ) {
                 val myInstance = MyClass()
                 val selectedItem = spinnerItems[position]
-
                 when (selectedItem) {
                     spinnerItems[2] -> {
                         imageView.setImageResource(R.drawable.unwrapped)
@@ -305,7 +311,7 @@ class PostWriting : AppCompatActivity() {
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                imageView.setImageResource(R.drawable.unwrapped)
+                imageView.setImageResource(R.drawable.normal)
                 imagewriting = "normal"
                 imagespinner = "상태 보통"
             }

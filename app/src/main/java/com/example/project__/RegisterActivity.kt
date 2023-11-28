@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -109,7 +110,7 @@ class RegisterActivity : AppCompatActivity() {
                                             user?.updateProfile(profileUpdates)
                                                 ?.addOnCompleteListener { profileTask ->
                                                     if (profileTask.isSuccessful) {
-                                                        message = "닉네임: $nickname \n 이름: $name, 이메일: $email, 생년월일: $selectedYear 년 $formattedMonth 월 $formattedDay 일"
+                                                        message = "닉네임: $nickname \n 이름: $name\n 이메일: $email\n 생년월일: $selectedYear 년 $formattedMonth 월 $formattedDay 일"
                                                         showSuccessDialog()
                                                     } else {
                                                         // 사용자 정보 업데이트 실패 시 에러 다이얼로그 표시
@@ -147,7 +148,9 @@ class RegisterActivity : AppCompatActivity() {
         alertDialog.setTitle("회원 가입 성공")
         alertDialog.setMessage(message)
         alertDialog.setPositiveButton("확인") { _, _ ->
-            val intent = Intent(this, LoginActivity::class.java)
+            val intent = Intent(this, MainActivity::class.java)
+            val welcomeMessage = "안녕하세요, ${Firebase.auth.currentUser?.displayName} 님!"
+            Toast.makeText(this, welcomeMessage, Toast.LENGTH_SHORT).show()
             startActivity(intent)
             finish()
         }

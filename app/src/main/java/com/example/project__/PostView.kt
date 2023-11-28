@@ -34,25 +34,6 @@ class PostView : AppCompatActivity() {
 
     val db: FirebaseFirestore = Firebase.firestore
 
-    fun updateSoldOutFalse(documentId: String, newFieldValue: Boolean) {
-
-        val db: FirebaseFirestore = Firebase.firestore
-        val documentRef = db.collection("pocket_post").document(documentId)
-
-        val updates = hashMapOf<String, Any>(
-            "soldout" to true
-        )
-        val updatesFalse = hashMapOf<String, Any>(
-            "soldout" to false
-        )
-
-        if (!newFieldValue)
-            documentRef.update(updatesFalse)
-        else
-            documentRef.update(updates)
-        Toast.makeText(applicationContext, "상태가 변경되었습니다.", Toast.LENGTH_SHORT).show()
-    }
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.top_nav_menu, menu)
         return true
@@ -78,14 +59,21 @@ class PostView : AppCompatActivity() {
         val imageView = findViewById<ImageView>(R.id.imageView)
         val sellerName = findViewById<TextView>(R.id.sellerName)
         val currentUser = FirebaseAuth.getInstance().currentUser?.displayName.toString()
-
+        val nowon = findViewById<TextView>(R.id.NowOn)
         val intent = intent
+        val soldout = intent.getBooleanExtra("soldout", false)
         title.text = intent.getStringExtra("title")
         price.text = intent.getLongExtra("price", 1000).toString() + " 원"
         text.text = intent.getStringExtra("text")
         sellerName.text = intent.getStringExtra("Author")
         val condition = intent.getStringExtra("condition")
         val id = intent.getStringExtra("id")
+        if(soldout){
+            nowon.text = "판매완료"
+        }
+        else{
+            nowon.text = "판매중"
+        }
         when(condition){
             "새 상품" -> {
                 imageView.setImageResource(R.drawable.unwrapped)
@@ -100,7 +88,6 @@ class PostView : AppCompatActivity() {
                 imageView.setImageResource(R.drawable.bad)
             }
         }
-        val soldout = intent.getBooleanExtra("soldout",false)
         if(soldout){
             imageView.setImageResource(R.drawable.soldout)
         }
@@ -159,7 +146,6 @@ class PostView : AppCompatActivity() {
 
     private fun CancelDialog(id: String) {
         cancelDialog.show() // 다이얼로그 띄우기
-
         val NoButton = cancelDialog.findViewById<Button>(R.id.NoButton)
         NoButton.setOnClickListener {
             cancelDialog.dismiss()
@@ -178,13 +164,14 @@ class PostView : AppCompatActivity() {
 
     private fun ChangeDialog(id: String) {
         changeDialog.show() // 다이얼로그 띄우기
-
+        val itemsCollectionRef = db.collection("pocket_post")
+        val documentRef = itemsCollectionRef.document(id)
         val SellButton = changeDialog.findViewById<Button>(R.id.NowSell)
         val NotSellButton = changeDialog.findViewById<Button>(R.id.NotSell)
         val CancelButton = changeDialog.findViewById<Button>(R.id.Cancel)
         val imageView = findViewById<ImageView>(R.id.imageView)
 
-        imageString = intent.getStringExtra("image")!!
+        imageString = intent.getStringExtra("image").toString()
 
         CancelButton.setOnClickListener {
             changeDialog.dismiss()
@@ -193,27 +180,51 @@ class PostView : AppCompatActivity() {
         SellButton.setOnClickListener {
             val NowOn = findViewById<TextView>(R.id.NowOn)
             if (NowOn.text != "판매중") {
-                NowOn.text = "판매중"
-                changeDialog.dismiss()
                 nowon = false
                 val resourceName = imageString // 동적으로 변경되는 리소스 이름
                 val resourceId = resources.getIdentifier(resourceName, "drawable", packageName)
                 imageView.setImageResource(resourceId)
-                updateSoldOutFalse(id, false)
+                val updates = hashMapOf<String, Any>(
+                    "soldout" to false
+                )
+                documentRef.update(updates)
+                    .addOnSuccessListener {
+                        Toast.makeText(applicationContext, "상태가 변경되었습니다.", Toast.LENGTH_SHORT).show()
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Error updating document", e)
+                        // Handle the failure if needed
+                    }
+                    .addOnCompleteListener {
+                        changeDialog.dismiss()
+                    }
+                NowOn.text = "판매중"
             }
-            changeDialog.dismiss()
         }
 
         NotSellButton.setOnClickListener {
             val NowOn = findViewById<TextView>(R.id.NowOn)
             if (NowOn.text != "판매완료") {
                 NowOn.text = "판매완료"
-                changeDialog.dismiss()
                 nowon = true
                 imageView.setImageResource(R.drawable.soldout)
-                updateSoldOutFalse(id, true)
+                val updates = hashMapOf<String, Any>(
+                    "soldout" to true
+                )
+                documentRef.update(updates)
+                    .addOnSuccessListener {
+                        Toast.makeText(applicationContext, "상태가 변경되었습니다.", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e(TAG, "Error updating document", e)
+                        // Handle the failure if needed
+                    }
+                    .addOnCompleteListener {
+                        changeDialog.dismiss()
+                    }
+                NowOn.text = "판매완료"
             }
-            changeDialog.dismiss()
         }
     }
 }

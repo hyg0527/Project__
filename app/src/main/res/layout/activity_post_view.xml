@@ -32,18 +32,6 @@
                 app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
                 app:title="" />
 
-            <TextView
-                android:id="@+id/TitleText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="8dp"
-                android:fontFamily="@font/gmarketbold"
-                android:text="제목"
-                android:textSize="24dp"
-                android:textStyle="bold" />
-
             <ImageView
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
@@ -97,9 +85,21 @@
             <View
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="16dp"
                 android:background="#e9ecef" />
+
+            <TextView
+                android:id="@+id/TitleText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="@font/gmarketbold"
+                android:text="제목"
+                android:textColor="@color/black"
+                android:textSize="24dp"
+                android:textStyle="bold" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -140,7 +140,7 @@
                 android:id="@+id/TextText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
+                android:layout_marginLeft="15dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginRight="10dp"
                 android:fontFamily="@font/gmarketmedium"

@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -33,7 +32,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_home, container, false)
         // RecyclerView 초기화
-        val swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipe)
         val recyclerView = view.findViewById<RecyclerView>(R.id.showItemrecyclerView)
         // LinearLayoutManager 설정
         val layoutManager = LinearLayoutManager(requireActivity())
@@ -49,14 +47,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         recyclerView.adapter = boardAdapter
         recyclerView.layoutManager = LinearLayoutManager(requireActivity(), LinearLayoutManager.VERTICAL, false)
 
-        swipeRefreshLayout.setOnRefreshListener {
-            loadData()
-            swipeRefreshLayout.isRefreshing = false
-        }
+
         val toolbar: Toolbar = view.findViewById(R.id.toolbar2)
         toolbar.inflateMenu(R.menu.filter)
         toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
+                R.id.top_refresh -> {
+                    loadData()
+                    true
+                }
                 R.id.menu_exclude_sold_out -> {
                     shouldExcludeSoldOut = !shouldExcludeSoldOut
                     loadData()

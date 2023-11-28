@@ -6,163 +6,169 @@
     android:layout_height="match_parent"
     android:background="@color/design_default_color_background">
 
-    <EditText
-        android:id="@+id/join_nickname"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="20dp"
-        android:ems="10"
-        android:fontFamily="@font/gmarketmedium"
-        android:hint="닉네임"
-        android:inputType="text"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/join_text" />
-
-    <EditText
-        android:id="@+id/join_email"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="12dp"
-        android:ems="15"
-        android:fontFamily="@font/gmarketmedium"
-        android:hint="이메일"
-        android:inputType="textEmailAddress"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerMonth" />
-
-    <EditText
-        android:id="@+id/join_password"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="12dp"
-        android:ems="10"
-        android:fontFamily="@font/gmarketmedium"
-        android:hint="비밀번호"
-        android:inputType="textPassword"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/join_email" />
-
-    <EditText
-        android:id="@+id/editPWConfirm"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="12dp"
-        android:ems="10"
-        android:fontFamily="@font/gmarketmedium"
-        android:hint="비밀번호 확인"
-        android:inputType="textPassword"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/join_password" />
-
-    <Button
-        android:id="@+id/join"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginTop="25dp"
-        android:backgroundTint="@color/darkblue"
-        android:fontFamily="@font/gmarketbold"
-        android:text="회원가입"
-        android:textColor="@color/white"
-        app:cornerRadius="5dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editPWConfirm" />
-
-    <EditText
-        android:id="@+id/join_name"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="12dp"
-        android:ems="10"
-        android:fontFamily="@font/gmarketmedium"
-        android:hint="이름"
-        android:inputType="text"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/join_nickname" />
-
-    <ImageView
-        android:id="@+id/join_logo"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="155dp"
-        android:layout_marginEnd="156dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar"
-        app:srcCompat="@drawable/logo" />
-
-    <TextView
-        android:id="@+id/join_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="179dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="180dp"
-        android:layout_marginBottom="35dp"
-        android:fontFamily="@font/gmarketbold"
-        android:text="회원가입"
-        android:textSize="28sp"
-        app:layout_constraintBottom_toTopOf="@+id/join_name"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/join_logo"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <Spinner
-        android:id="@+id/spinnerYear"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginStart="55dp"
-        android:layout_marginTop="12dp"
-        android:autofillHints="2000"
-        app:layout_constraintStart_toEndOf="@+id/birthtext"
-        app:layout_constraintTop_toBottomOf="@+id/join_name" />
-
-    <Spinner
-        android:id="@+id/spinnerMonth"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="12dp"
-        android:autofillHints="11"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerYear" />
-
-    <Spinner
-        android:id="@+id/spinnerDay"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="12dp"
-        android:autofillHints="24"
-        app:layout_constraintStart_toEndOf="@+id/spinnerMonth"
-        app:layout_constraintTop_toBottomOf="@+id/spinnerYear" />
-
-    <TextView
-        android:id="@+id/birthtext"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="48dp"
-        android:layout_marginTop="25dp"
-        android:fontFamily="@font/gmarketmedium"
-        android:text="생년월일"
-        android:textSize="24sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/join_name" />
-
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="@color/pocket"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        app:layoutDescription="scroll">
+
+        <EditText
+            android:id="@+id/join_nickname"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="20dp"
+            android:ems="10"
+            android:fontFamily="@font/gmarketmedium"
+            android:hint="닉네임"
+            android:inputType="text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/join_text" />
+
+        <EditText
+            android:id="@+id/join_email"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="12dp"
+            android:ems="15"
+            android:fontFamily="@font/gmarketmedium"
+            android:hint="이메일"
+            android:inputType="textEmailAddress"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinnerMonth" />
+
+        <EditText
+            android:id="@+id/join_password"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="12dp"
+            android:ems="10"
+            android:fontFamily="@font/gmarketmedium"
+            android:hint="비밀번호"
+            android:inputType="textPassword"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/join_email" />
+
+        <EditText
+            android:id="@+id/editPWConfirm"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="12dp"
+            android:ems="10"
+            android:fontFamily="@font/gmarketmedium"
+            android:hint="비밀번호 확인"
+            android:inputType="textPassword"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/join_password" />
+
+        <Button
+            android:id="@+id/join"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginTop="25dp"
+            android:backgroundTint="@color/darkblue"
+            android:fontFamily="@font/gmarketbold"
+            android:text="회원가입"
+            android:textColor="@color/white"
+            app:cornerRadius="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editPWConfirm" />
+
+        <EditText
+            android:id="@+id/join_name"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="12dp"
+            android:ems="10"
+            android:fontFamily="@font/gmarketmedium"
+            android:hint="이름"
+            android:inputType="text"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/join_nickname" />
+
+        <ImageView
+            android:id="@+id/join_logo"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginStart="155dp"
+            android:layout_marginEnd="156dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/toolbar"
+            app:srcCompat="@drawable/logo" />
+
+        <TextView
+            android:id="@+id/join_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="179dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="180dp"
+            android:layout_marginBottom="35dp"
+            android:fontFamily="@font/gmarketbold"
+            android:text="회원가입"
+            android:textSize="28sp"
+            app:layout_constraintBottom_toTopOf="@+id/join_name"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/join_logo"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <Spinner
+            android:id="@+id/spinnerYear"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="55dp"
+            android:layout_marginTop="12dp"
+            android:autofillHints="2000"
+            app:layout_constraintStart_toEndOf="@+id/birthtext"
+            app:layout_constraintTop_toBottomOf="@+id/join_name" />
+
+        <Spinner
+            android:id="@+id/spinnerMonth"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="12dp"
+            android:autofillHints="11"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/spinnerYear" />
+
+        <Spinner
+            android:id="@+id/spinnerDay"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginTop="12dp"
+            android:autofillHints="24"
+            app:layout_constraintStart_toEndOf="@+id/spinnerMonth"
+            app:layout_constraintTop_toBottomOf="@+id/spinnerYear" />
+
+        <TextView
+            android:id="@+id/birthtext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="48dp"
+            android:layout_marginTop="25dp"
+            android:fontFamily="@font/gmarketmedium"
+            android:text="생년월일"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/join_name" />
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/pocket"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
